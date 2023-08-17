@@ -23,6 +23,7 @@
     "event-source-polyfill": "^1.0.7",
     "fastscan": "^1.0.4",
     "good-storage": "^1.1.0",
+    "inflection": "^2.0.1",
     "js-cookie": "^2.2.0",
     "lodash": "^4.17.14",
     "mitt": "^2.1.0",

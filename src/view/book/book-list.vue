@@ -35,7 +35,7 @@
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import bookModel from '@/model/book'
-import BookModify from './book'
+import BookModify from './book-edit'
 
 export default {
   components: {

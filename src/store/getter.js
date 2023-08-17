@@ -193,14 +193,14 @@ function deepTravel(obj, fuc) {
  * 在侧边栏展示时，如果当前路由 children 属性为空，则删除该路由
  * @param {*} arr 路由配置项数据
  */
-function IterationDelateMenuChildren(arr) {
+function IterationDeleteMenuChildren(arr) {
   if (arr.length) {
     // eslint-disable-next-line no-unused-vars
     for (const i in arr) {
       if (arr[i].children && !arr[i].children.length) {
         delete arr[i]
       } else if (arr[i].children && arr[i].children.length) {
-        IterationDelateMenuChildren(arr[i].children)
+        IterationDeleteMenuChildren(arr[i].children)
       }
     }
   }
@@ -223,5 +223,5 @@ function permissionShaking(stageConfig, permissions, currentUser) {
     }
     return false
   })
-  return IterationDelateMenuChildren(shookConfig)
+  return IterationDeleteMenuChildren(shookConfig)
 }

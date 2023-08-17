@@ -175,6 +175,33 @@ Utils.sortByOrder = (source = []) => {
 }
 
 /**
+ * 深度遍历配置树, 摘取叶子节点作为路由部分
+ * @param {*} config 配置项
+ * @param {*} fuc 回调函数
+ * @param {*} parent 传递给fuc的config的父节点
+ */
+function deepTravel(config, fuc, parent = null) {
+  if (Array.isArray(config)) {    // 处理
+    config.forEach(subConfig => {
+      deepTravel(subConfig, fuc)
+    })
+  } else if (config.children?.length) {
+    config.children.forEach(subConfig => {
+      deepTravel(subConfig, fuc, config)
+    })
+  } else {
+    fuc(config, parent)
+  }
+}
+
+/**
+ * 深度遍历配置树, 摘取叶子节点作为路由部分
+ * @param {*} config 配置项
+ * @param {*} fuc 回调函数
+ */
+Utils.deepTravel = deepTravel
+
+/**
  * 深度遍历，深拷贝
  * @param {*} data
  */
