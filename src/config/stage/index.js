@@ -50,11 +50,12 @@ let homeRouter = [
 ]
 
 const res = require.context('@/config/stage/module/', false, /\/.*\.js$/, 'sync')    // require.context must use literal
-console.log(res.keys())
 res.keys().reduce((router, path) => {
   // console.log(modules, res.resolve(path), path)
   const value = res(path).default
-  router.push(value)
+  if (value) {
+    router.push(value)
+  }
   return router
 }, homeRouter)
 
