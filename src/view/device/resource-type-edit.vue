@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <div class="title" v-if="!editModelId">新建template-name{{ editModelId }}</div>
+    <div class="title" v-if="!editModelId">新建设备类型{{ editModelId }}</div>
     <div class="title" v-else>
-      <span>修改template-name</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+      <span>修改设备类型</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
 
     <div class="wrap">
@@ -12,12 +12,15 @@
             <el-form-item label="名称" prop="name">
               <el-input v-model="data.name" placeholder="请填写名称"></el-input>
             </el-form-item>
-            <el-form-item label="简介" prop="summary">
+            <el-form-item label="数据表" prop="table_name">
+              <el-input v-model="data.table_name" placeholder="请填写数据表名称"></el-input>
+            </el-form-item>
+            <el-form-item label="描述" prop="description">
               <el-input
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 8 }"
-                placeholder="请输入简介"
-                v-model="data.summary"
+                placeholder="请输入描述"
+                v-model="data.description"
               >
               </el-input>
             </el-form-item>
@@ -37,7 +40,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/template-resource')
+genericModel.initRoute('v1/resource-type')
 
 export default {
   props: {
@@ -49,7 +52,7 @@ export default {
   setup(props, context) {
     const form = ref(null)
     const loading = ref(false)
-    const data = reactive({ name: '', summary: '' })
+    const data = reactive({ name: '', table_name: '', description: '' })
 
     const listAssign = (a, b) => Object.keys(a).forEach(key => {
       a[key] = b[key] || a[key]
@@ -129,7 +132,8 @@ function getRules() {
   }
   const rules = {
     name: [{ validator: checkInfo, trigger: 'blur', required: true }],
-    // summary: [{ validator: checkInfo, trigger: 'blur', required: true }],
+    table_name: [{ validator: checkInfo, trigger: 'blur', required: true }],
+    // description: [{ validator: checkInfo, trigger: 'blur', required: true }],
   }
   return { rules }
 }
