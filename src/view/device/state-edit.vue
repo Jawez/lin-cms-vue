@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <div class="title" v-if="!editModelId">新建template-name{{ editModelId }}</div>
+    <div class="title" v-if="!editModelId">新建状态{{ editModelId }}</div>
     <div class="title" v-else>
-      <span>修改template-name</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+      <span>修改状态</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
 
     <div class="wrap">
@@ -37,7 +37,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/template-resource')
+genericModel.initRoute('v1/state')
 
 export default {
   props: {

@@ -1,8 +1,8 @@
 <template>
   <div class="container">
-    <div class="title" v-if="!editModelId">新建template-name{{ editModelId }}</div>
+    <div class="title" v-if="!editModelId">新建抓包工具{{ editModelId }}</div>
     <div class="title" v-else>
-      <span>修改template-name</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+      <span>修改抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
 
     <div class="wrap">
@@ -12,7 +12,7 @@
             <el-form-item label="名称" prop="name">
               <el-input v-model="data.name" placeholder="请填写名称"></el-input>
             </el-form-item>
-            <el-form-item label="描述" prop="summary">
+            <el-form-item label="描述" prop="description">
               <el-input
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 8 }"
@@ -20,6 +20,26 @@
                 v-model="data.summary"
               >
               </el-input>
+            </el-form-item>
+            <el-form-item label="管理员" prop="name">
+              <el-select v-model="manager_value" class="m-2" placeholder="Select">
+                <el-option
+                    v-for="item in manager_id_list"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+              </el-select>
+            </el-form-item>
+            <el-form-item label="状态" prop="name">
+              <el-select v-model="state_value" class="m-2" placeholder="State">
+                <el-option
+                    v-for="item in state_id_list"
+                    :key="item.id"
+                    :label="item.name"
+                    :value="item.id"
+                  />
+              </el-select>
             </el-form-item>
 
             <el-form-item class="submit">
@@ -36,8 +56,9 @@
 <script>
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
+import dynamicModel from '@/model/generic-model'
 import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/template-resource')
+genericModel.initRoute('v1/analyzer')
 
 export default {
   props: {
@@ -49,7 +70,11 @@ export default {
   setup(props, context) {
     const form = ref(null)
     const loading = ref(false)
-    const data = reactive({ name: '', summary: '' })
+
+    const state_value = ref('')
+    const data = reactive({ name: '', description: '', manager_id: 0, state_id: 0 })
+    let manager_id_list = reactive([])
+    let state_id_list = reactive([])
 
     const listAssign = (a, b) => Object.keys(a).forEach(key => {
       a[key] = b[key] || a[key]
@@ -61,16 +86,29 @@ export default {
     const { rules } = getRules()
 
     onMounted(() => {
+      loading.value = true
+      getManagerList()
+      getStateList()
       if (props.editModelId) {
         getModel()
       }
+      loading.value = false
     })
 
     const getModel = async () => {
-      loading.value = true
       const res = await genericModel.getModel(props.editModelId)
       listAssign(data, res)
-      loading.value = false
+    }
+
+    const getManagerList = async () => {
+      // dynamicModel.initRoute('v1/user')
+    }
+
+    const getStateList = async () => {
+      dynamicModel.initRoute('v1/state')
+      const id_list = await dynamicModel.getModels()
+      // console.log(id_list)
+      state_id_list.push(...id_list)
     }
 
     // 重置表单
@@ -105,7 +143,10 @@ export default {
 
     return {
       back,
+      state_value,
       data,
+      manager_id_list,
+      state_id_list,
       form,
       rules,
       resetForm,
@@ -129,7 +170,6 @@ function getRules() {
   }
   const rules = {
     name: [{ validator: checkInfo, trigger: 'blur', required: true }],
-    // summary: [{ validator: checkInfo, trigger: 'blur', required: true }],
   }
   return { rules }
 }

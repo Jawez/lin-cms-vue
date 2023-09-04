@@ -23,6 +23,30 @@ const deviceRouter = {
       inNav: true,
       icon: 'iconfont icon-add',
     },
+    {
+      title: '状态列表',
+      name: 'StateList',
+      inNav: true,
+      icon: 'iconfont icon-table1',
+    },
+    {
+      title: '添加状态',
+      name: 'StateEdit',
+      inNav: true,
+      icon: 'iconfont icon-add',
+    },
+    {
+      title: '抓包工具列表',
+      name: 'AnalyzerList',
+      inNav: true,
+      icon: 'iconfont icon-table1',
+    },
+    {
+      title: '添加抓包工具',
+      name: 'AnalyzerEdit',
+      inNav: true,
+      icon: 'iconfont icon-add',
+    },
   ],
 }
 

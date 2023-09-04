@@ -3,10 +3,10 @@
     <!-- 列表页面 -->
     <div class="container" v-if="!showEdit">
       <div class="header">
-        <div class="title">template-name列表</div>
+        <div class="title">状态列表</div>
       </div>
       <!-- 表格 -->
-      <el-table :data="template_data_group" v-loading="loading">
+      <el-table :data="state_group" v-loading="loading">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="summary" label="简介"></el-table-column>
@@ -19,7 +19,7 @@
               size="small"
               type="danger"
               @click="handleDelete(scope.row.id)"
-              v-permission="{ permission: '删除template-name', type: 'disabled' }"
+              v-permission="{ permission: '删除状态', type: 'disabled' }"
               >删除</el-button
             >
           </template>
@@ -36,15 +36,15 @@
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/template-resource')
-import ObjectModify from './template-resource-edit'
+genericModel.initRoute('v1/state')
+import ObjectModify from './state-edit'
 
 export default {
   components: {
     ObjectModify,
   },
   setup() {
-    const template_data_group = ref([])
+    const state_group = ref([])
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
@@ -56,12 +56,12 @@ export default {
     const getModels = async () => {
       try {
         loading.value = true
-        template_data_group.value = await genericModel.getModels()
+        state_group.value = await genericModel.getModels()
         loading.value = false
       } catch (error) {
         loading.value = false
         if (error.code === 10020) {
-          template_data_group.value = []
+          state_group.value = []
         }
       }
     }
@@ -93,7 +93,7 @@ export default {
     const indexMethod = index => index + 1
 
     return {
-      template_data_group,
+      state_group,
       loading,
       showEdit,
       editClose,
