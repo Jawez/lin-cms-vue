@@ -39,8 +39,8 @@
 <script>
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/resource-type')
+import GenericModel from '@/model/generic-model'
+const genericModel = new GenericModel('v1/resource-type')
 
 export default {
   props: {

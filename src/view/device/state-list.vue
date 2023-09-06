@@ -9,7 +9,7 @@
       <el-table :data="state_group" v-loading="loading">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
-        <el-table-column prop="summary" label="简介"></el-table-column>
+        <el-table-column prop="description" label="描述"></el-table-column>
         <el-table-column label="操作" fixed="right" width="275">
           <template #default="scope">
             <el-button plain size="small" type="primary" @click="handleEdit(scope.row.id)">编辑</el-button>
@@ -35,8 +35,8 @@
 <script>
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/state')
+import GenericModel from '@/model/generic-model'
+const genericModel = new GenericModel('v1/state')
 import ObjectModify from './state-edit'
 
 export default {

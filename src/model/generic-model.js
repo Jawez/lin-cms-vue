@@ -3,7 +3,11 @@ import _axios, { get, put, _delete } from '@/lin/plugin/axios'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
 class GenericModel {
-  initRoute(route) {
+  constructor(route) {
+    this.route = route
+  }
+
+  setRoute(route) {
     this.route = route
   }
 
@@ -43,4 +47,4 @@ class GenericModel {
   }
 }
 
-export default new GenericModel()
+export default GenericModel

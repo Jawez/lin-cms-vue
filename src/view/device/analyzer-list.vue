@@ -11,7 +11,11 @@
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
         <el-table-column prop="manager_id" label="管理员"></el-table-column>
-        <el-table-column prop="state_id" label="状态"></el-table-column>
+        <el-table-column label="状态">
+          <template #default="scope">
+            <div>{{stateIdList[scope.row.state_id].name}}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="操作" fixed="right" width="275">
           <template #default="scope">
             <el-button plain size="small" type="primary" @click="handleEdit(scope.row.id)">编辑</el-button>
@@ -30,15 +34,19 @@
     </div>
 
     <!-- 编辑页面 -->
-    <object-modify v-else @editClose="editClose" :editModelId="editModelId"></object-modify>
+    <object-modify v-else @editClose="editClose"
+      :editModelId="editModelId"
+      :managerIdList="managerIdList"
+      :stateIdList="stateIdList"></object-modify>
   </div>
 </template>
 
 <script>
-import { onMounted, ref } from 'vue'
+import { reactive, onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/analyzer')
+import GenericModel from '@/model/generic-model'
+const genericModel = new GenericModel('v1/analyzer')
+const dynamicModel = new GenericModel('v1/analyzer')
 import ObjectModify from './analyzer-edit'
 
 export default {
@@ -50,22 +58,36 @@ export default {
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
+    let managerIdList = reactive([])
+    let stateIdList = reactive([])
 
     onMounted(() => {
+      loading.value = true
+      getManagerList()
+      getStateList()
       getModels()
+      loading.value = false
     })
 
     const getModels = async () => {
       try {
-        loading.value = true
         analyzers.value = await genericModel.getModels()
-        loading.value = false
       } catch (error) {
-        loading.value = false
         if (error.code === 10020) {
           analyzers.value = []
         }
       }
+    }
+
+    const getManagerList = async () => {
+      // dynamicModel.setRoute('v1/user')
+    }
+
+    const getStateList = async () => {
+      dynamicModel.setRoute('v1/state')
+      const idList = await dynamicModel.getModels()
+      console.log(idList)
+      stateIdList.push(...idList)
     }
 
     const handleEdit = id => {
@@ -98,6 +120,8 @@ export default {
       analyzers,
       loading,
       showEdit,
+      managerIdList,
+      stateIdList,
       editClose,
       handleEdit,
       editModelId,

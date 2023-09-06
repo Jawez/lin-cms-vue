@@ -12,12 +12,12 @@
             <el-form-item label="名称" prop="name">
               <el-input v-model="data.name" placeholder="请填写名称"></el-input>
             </el-form-item>
-            <el-form-item label="描述" prop="summary">
+            <el-form-item label="描述" prop="description">
               <el-input
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 8 }"
                 placeholder="请输入描述"
-                v-model="data.summary"
+                v-model="data.description"
               >
               </el-input>
             </el-form-item>
@@ -36,8 +36,8 @@
 <script>
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
-import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/template-resource')
+import GenericModel from '@/model/generic-model'
+const genericModel = new GenericModel('v1/template-resource')
 
 export default {
   props: {
@@ -49,7 +49,7 @@ export default {
   setup(props, context) {
     const form = ref(null)
     const loading = ref(false)
-    const data = reactive({ name: '', summary: '' })
+    const data = reactive({ name: '', description: '' })
 
     const listAssign = (a, b) => Object.keys(a).forEach(key => {
       a[key] = b[key] || a[key]
@@ -129,7 +129,7 @@ function getRules() {
   }
   const rules = {
     name: [{ validator: checkInfo, trigger: 'blur', required: true }],
-    // summary: [{ validator: checkInfo, trigger: 'blur', required: true }],
+    // description: [{ validator: checkInfo, trigger: 'blur', required: true }],
   }
   return { rules }
 }

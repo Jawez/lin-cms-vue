@@ -35,8 +35,8 @@
 <script>
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
-import genericModel from '@/model/generic-model'
-genericModel.initRoute('v1/resource-type')
+import GenericModel from '@/model/generic-model'
+const genericModel = new GenericModel('v1/resource-type')
 // import ObjectModify from './__name-edit'
 import ObjectModify from './resource-type-edit'
 
