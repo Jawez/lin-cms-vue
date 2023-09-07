@@ -43,12 +43,13 @@ export default {
       const _this = this
       let timer = requestAnimationFrame(function fn() {
         const currentTop = _this.targetDom.target.scrollTop
-        if (currentTop > 0) {
+        if (currentTop > 10) {
           // 平滑滚动
           const scrollSpeed = currentTop + (0 - currentTop) / 6
           _this.targetDom.target.scrollTop = scrollSpeed
           timer = requestAnimationFrame(fn)
         } else {
+          _this.targetDom.target.scrollTop = scrollSpeed
           cancelAnimationFrame(timer)
         }
       })

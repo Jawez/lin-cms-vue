@@ -1,6 +1,8 @@
 <template>
   <div class="container">
-    <div class="title" v-if="!editModelId">新建抓包工具{{ editModelId }}</div>
+    <div class="title" v-if="!editModelId">
+      <span>新建抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+    </div>
     <div class="title" v-else>
       <span>修改抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
@@ -17,22 +19,22 @@
                 type="textarea"
                 :autosize="{ minRows: 4, maxRows: 8 }"
                 placeholder="请输入描述"
-                v-model="data.summary"
+                v-model="data.description"
               >
               </el-input>
             </el-form-item>
             <el-form-item label="管理员" prop="name">
-              <el-select v-model="managerValue" class="m-2" placeholder="Select">
+              <el-select v-model="data.manager_id" class="m-2" placeholder="Select">
                 <el-option
                     v-for="item in managerIdList"
                     :key="item.id"
-                    :label="item.name"
+                    :label="item.username"
                     :value="item.id"
                   />
               </el-select>
             </el-form-item>
             <el-form-item label="状态" prop="name">
-              <el-select v-model="stateValue" class="m-2" placeholder="State">
+              <el-select v-model="data.state_id" class="m-2" placeholder="State">
                 <el-option
                     v-for="item in stateIdList"
                     :key="item.id"
@@ -78,8 +80,7 @@ export default {
     const form = ref(null)
     const loading = ref(false)
 
-    const stateValue = ref('')
-    const data = reactive({ name: '', description: '', manager_id: 0, state_id: 0 })
+    const data = reactive({ name: '', description: '', manager_id: null, state_id: null })
 
     const listAssign = (a, b) => Object.keys(a).forEach(key => {
       a[key] = b[key] || a[key]
@@ -135,7 +136,6 @@ export default {
 
     return {
       back,
-      stateValue,
       data,
       form,
       rules,

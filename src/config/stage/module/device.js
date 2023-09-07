@@ -2,7 +2,6 @@ const deviceRouter = {
   title: '设备管理',
   icon: 'iconfont icon-erjituandui',
   order: null,
-  // permission: ['超级管理员独有权限'],
 
   route: null,
   name: null,
@@ -40,12 +39,6 @@ const deviceRouter = {
       name: 'AnalyzerList',
       inNav: true,
       icon: 'iconfont icon-table1',
-    },
-    {
-      title: '添加抓包工具',
-      name: 'AnalyzerEdit',
-      inNav: true,
-      icon: 'iconfont icon-add',
     },
   ],
 }
