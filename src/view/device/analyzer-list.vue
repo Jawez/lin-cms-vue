@@ -44,6 +44,11 @@
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
+        <el-table-column label="组织">
+          <template #default="scope">
+            <div>{{getOrganizationById(scope.row.organization_id)}}</div>
+          </template>
+        </el-table-column>
         <el-table-column label="管理员">
           <template #default="scope">
             <div>{{getManagerById(scope.row.manager_id)}}</div>
@@ -77,6 +82,7 @@
     <!-- 编辑页面 -->
     <object-modify v-else @editClose="editClose"
       :editModelId="editModelId"
+      :organizationIdList="organizationIdList"
       :managerIdList="managerIdList"
       :stateIdList="stateIdList"></object-modify>
   </div>
@@ -100,6 +106,7 @@ export default {
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
+    const organizationIdList = ref([])
     const managerIdList = ref([])
     const stateIdList = ref([])
     const tableHeight = ref(300)
@@ -108,6 +115,7 @@ export default {
       window.addEventListener('resize', () => { setResize() }, false)
       setResize()
       loading.value = true
+      getOrganizationList()
       getManagerList()
       getStateList()
       getModels()
@@ -129,6 +137,13 @@ export default {
           tableData.value = []
         }
       }
+    }
+
+    const getOrganizationList = async () => {
+      dynamicModel.setRoute('v1/organization')
+      const idList = await dynamicModel.getModels()
+      // console.log(idList)
+      organizationIdList.value = idList
     }
 
     /**
@@ -154,6 +169,11 @@ export default {
       const idList = await dynamicModel.getModels()
       // console.log(idList)
       stateIdList.value = idList
+    }
+
+    const getOrganizationById = id => {
+      const item = organizationIdList.value.find(item => item.id === id) || {}
+      return item.name
     }
 
     const getManagerById = id => {
@@ -216,10 +236,12 @@ export default {
       tableData,
       loading,
       showEdit,
+      organizationIdList,
       managerIdList,
       stateIdList,
       tableHeight,
       editClose,
+      getOrganizationById,
       getManagerById,
       getStateById,
       getStateTagTypeById,

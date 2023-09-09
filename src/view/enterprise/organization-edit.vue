@@ -1,10 +1,8 @@
 <template>
   <div class="container">
-    <div class="title" v-if="!editModelId">
-      <span>新建抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
-    </div>
+    <div class="title" v-if="!editModelId">新建组织{{ editModelId }}</div>
     <div class="title" v-else>
-      <span>修改抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+      <span>修改组织</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
 
     <div class="wrap">
@@ -23,36 +21,6 @@
               >
               </el-input>
             </el-form-item>
-            <el-form-item label="组织" prop="name">
-              <el-select v-model="data.organization_id" class="m-2" placeholder="Select">
-                <el-option
-                    v-for="item in organizationIdList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="管理员" prop="name">
-              <el-select v-model="data.manager_id" class="m-2" placeholder="Select">
-                <el-option
-                    v-for="item in managerIdList"
-                    :key="item.id"
-                    :label="item.username"
-                    :value="item.id"
-                  />
-              </el-select>
-            </el-form-item>
-            <el-form-item label="状态" prop="name">
-              <el-select v-model="data.state_id" class="m-2" placeholder="State">
-                <el-option
-                    v-for="item in stateIdList"
-                    :key="item.id"
-                    :label="item.name"
-                    :value="item.id"
-                  />
-              </el-select>
-            </el-form-item>
 
             <el-form-item class="submit">
               <el-button type="primary" @click="submitForm">保 存</el-button>
@@ -69,7 +37,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/analyzer')
+const genericModel = new GenericModel('v1/organization')
 
 export default {
   props: {
@@ -77,31 +45,11 @@ export default {
       type: Number,
       default: null,
     },
-    organizationIdList: {
-      type: Array,
-      default: () => [],
-    },
-    managerIdList: {
-      type: Array,
-      default: () => [],
-    },
-    stateIdList: {
-      type: Array,
-      default: () => [],
-    },
   },
   setup(props, context) {
     const form = ref(null)
     const loading = ref(false)
-
-    const data = reactive({
-      name: '',
-      description: '',
-      image: null,
-      organization_id: null,
-      manager_id: null,
-      state_id: null
-    })
+    const data = reactive({ name: '', description: '' })
 
     const listAssign = (a, b) => Object.keys(a).forEach(key => {
       a[key] = b[key] || a[key]
@@ -113,16 +61,16 @@ export default {
     const { rules } = getRules()
 
     onMounted(() => {
-      loading.value = true
       if (props.editModelId) {
         getModel()
       }
-      loading.value = false
     })
 
     const getModel = async () => {
+      loading.value = true
       const res = await genericModel.getModel(props.editModelId)
       listAssign(data, res)
+      loading.value = false
     }
 
     // 重置表单
@@ -181,6 +129,7 @@ function getRules() {
   }
   const rules = {
     name: [{ validator: checkInfo, trigger: 'blur', required: true }],
+    // description: [{ validator: checkInfo, trigger: 'blur', required: true }],
   }
   return { rules }
 }
