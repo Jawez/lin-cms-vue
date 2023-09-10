@@ -61,22 +61,52 @@
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="240">
           <template #default="scope">
-            <el-button plain size="small" type="primary" @click="handleEdit(scope.row.id)">编辑</el-button>
+            <el-button
+              plain
+              size="small"
+              type="primary"
+              @click="handleEdit(scope.row.id)"
+              disabled
+              >领用
+            </el-button>
+            <el-button
+              plain
+              size="small"
+              type="primary"
+              @click="handleEdit(scope.row.id)"
+              v-permission="'更新资源'"
+              >编辑
+            </el-button>
             <!-- <el-button plain size="small" type="primary" @click="$router.push(`/__name/edit`)">编辑</el-button> -->
             <el-button
               plain
               size="small"
               type="danger"
               @click="handleDelete(scope.row.id)"
-              v-permission="{ permission: '删除抓包工具', type: 'disabled' }"
-              >删除</el-button
-            >
+              v-permission="'删除资源'"
+              >删除
+            </el-button>
+            <!-- <el-button
+              plain
+              size="small"
+              type="danger"
+              @click="handleDelete(scope.row.id)"
+              v-permission="{ permission: '删除资源', type: 'disabled' }"
+              >删除
+            </el-button> -->
           </template>
         </el-table-column>
       </el-table>
       <!-- 添加按钮 -->
       <!-- <el-button class="mt-2" style="width: 100%" @click="$router.push(`/analyzer/edit`)">添加</el-button> -->
-      <el-button type="primary" plain style="width: 100%" @click="handleCreate()">添加</el-button>
+      <el-button
+        type="primary"
+        plain
+        style="width: 100%"
+        @click="handleCreate()"
+        v-permission="'添加资源'"
+        >添加
+      </el-button>
     </div>
 
     <!-- 编辑页面 -->
@@ -151,14 +181,9 @@ export default {
      */
     const getManagerList = async () => {
       try {
-        const managerGroup = (await ManagerModel.getAllGroups()).find(group => group.name === '设备管理员') || {}
-        const groupId = managerGroup.id || 0
-        const res = await ManagerModel.getAdminUsers({
-          groupId: groupId,
-          count: 100,
-          page: 0,
-        })
-        managerIdList.value = res.items
+        const res = await ManagerModel.getManagers('设备管理员')
+        managerIdList.value = res.users
+        // console.log(managerIdList.value)
       } catch (e) {
         console.error(e)
       }
