@@ -3,7 +3,7 @@ const Config = {
   openAutoJumpOut: true, // 是否开启无操作跳出
   defaultRoute: '/about', // 默认打开的路由
   websocketEnable: false, // 默认关闭 websocket
-  showSidebarSearch: true, // 默认打开侧边栏搜索
+  showSidebarSearch: false, // 默认打开侧边栏搜索
   notLoginRoute: ['login'], // 无需登录即可访问的路由 name,
   useFrontEndErrorMsg: false, // 默认采用后端返回异常
   stagnateTime: 60 * 60 * 1000, // 无操作停滞时间，默认1小时

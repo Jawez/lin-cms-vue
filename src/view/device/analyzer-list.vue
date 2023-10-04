@@ -9,36 +9,11 @@
       <el-table :data="tableData" v-loading="loading" :max-height="tableHeight">
         <el-table-column type="expand">
           <template #default="props">
-            <!-- <div>名称：{{ props.row.name }}</div>
-            <div>描述：{{ props.row.description }}</div> -->
-
-            <!-- <el-row :gutter="20">
-              <el-col :span="8" :offset="6">
-                <div class="grid-content ep-bg-purple">名称：{{ props.row.name }}</div>
-              </el-col>
-            </el-row>
-            <el-row :gutter="20">
-              <el-col :span="8" :offset="6">
-                <div class="grid-content ep-bg-purple">描述：{{ props.row.description }}</div>
-              </el-col>
-            </el-row> -->
-
             <div class="descriptions">
-              <!-- <el-descriptions title="User Info" direction="direction"> -->
               <el-descriptions column="1" :title="props.row.name">
-                <!-- <el-descriptions-item label="名称：">{{ props.row.name }}</el-descriptions-item> -->
                 <el-descriptions-item>{{ props.row.description }}</el-descriptions-item>
               </el-descriptions>
             </div>
-
-            <!-- <el-form status-icon ref="form" label-width="100px" @submit.prevent :rules="rules">
-              <el-form-item label="名称：">
-                <div>{{ props.row.name }}</div>
-              </el-form-item>
-              <el-form-item label="描述：">
-                <div>{{ props.row.description }}</div>
-              </el-form-item>
-            </el-form> -->
           </template>
         </el-table-column>
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
@@ -56,7 +31,7 @@
         </el-table-column>
         <el-table-column label="状态">
           <template #default="scope">
-            <el-tag :type="getStateTagTypeById(scope.row.state_id)">{{getStateById(scope.row.state_id)}}</el-tag>
+            <el-tag :type="getStateTagTypeById(scope.row.state_id)">{{getStateNameById(scope.row.state_id)}}</el-tag>
           </template>
         </el-table-column>
         <el-table-column label="操作" fixed="right" width="240">
@@ -65,9 +40,32 @@
               plain
               size="small"
               type="primary"
-              @click="handleEdit(scope.row.id)"
-              disabled
+              @click="handleBorrow(scope.row)"
+              v-if="getStateAvailableById(scope.row.state_id)"
               >领用
+            </el-button>
+            <el-button
+              plain
+              size="small"
+              type="success"
+              @click="handleReturn(scope.row)"
+              v-else-if="getStateBorrowedById(scope.row.state_id) && canReturn(scope.row)"
+              >归还
+            </el-button>
+            <el-button
+              plain
+              size="small"
+              type="success"
+              disabled
+              v-else-if="getStateBorrowedById(scope.row.state_id)"
+              >归还
+            </el-button>
+            <el-button
+              plain
+              size="small"
+              disabled
+              v-else
+              >禁用
             </el-button>
             <el-button
               plain
@@ -115,11 +113,99 @@
       :organizationIdList="organizationIdList"
       :managerIdList="managerIdList"
       :stateIdList="stateIdList"></object-modify>
+
+    <el-dialog v-model="formBorrow.visible" title="领用设备">
+      <el-form :model="formBorrow" ref="form" @submit.prevent :rules="rules">
+        <el-form-item label="名称" :label-width="formLabelWidth">
+          <el-input v-model="formBorrow.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="描述" :label-width="formLabelWidth">
+          <el-input v-model="formBorrow.description" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="组织" :label-width="formLabelWidth">
+          <el-input v-model="formBorrow.organization_id" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="领用事由" :label-width="formLabelWidth">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 8 }"
+            placeholder="请输入描述"
+            v-model="formBorrow.borrow_reason"
+            autocomplete="off"
+          >
+          </el-input>
+        </el-form-item>
+        <el-form-item label="领用时间" :label-width="formLabelWidth">
+          <el-date-picker
+            v-model="formBorrow.timeRange"
+            type="datetimerange"
+            :editable="false"
+            start-placeholder="领用时间"
+            end-placeholder="预计归还时间"
+            :default-time="timeDefault"
+            :unlink-panels="true"
+            :shortcuts="timeShortcuts"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DD HH:mm:00.000"
+          />
+          <!-- "YYYY-MM-DD HH:mm:ss.SSS" -->
+        </el-form-item>
+        <el-form-item class="submit">
+          <el-button type="primary" @click="submitBorrowForm">确 认</el-button>
+          <el-button @click="formBorrow.visible = false">取 消</el-button>
+        </el-form-item>
+      </el-form>
+      <!-- <template #footer>
+        <span class="dialog-footer">
+          <el-button @click="dialogFormVisible = false">取消</el-button>
+          <el-button type="primary" @click="submitBorrowForm">确认</el-button>
+        </span>
+      </template> -->
+    </el-dialog>
+
+    <el-dialog v-model="formReturn.visible" title="归还设备">
+      <el-form :model="formReturn" ref="form" @submit.prevent :rules="rules">
+        <el-form-item label="名称" :label-width="formLabelWidth">
+          <el-input v-model="formReturn.name" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="描述" :label-width="formLabelWidth">
+          <el-input v-model="formReturn.description" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="组织" :label-width="formLabelWidth">
+          <el-input v-model="formReturn.organization_id" autocomplete="off" />
+        </el-form-item>
+        <el-form-item label="备注" :label-width="formLabelWidth">
+          <el-input
+            type="textarea"
+            :autosize="{ minRows: 2, maxRows: 8 }"
+            placeholder="请输入描述"
+            v-model="formReturn.comment"
+            autocomplete="off"
+          >
+          </el-input>
+        </el-form-item>
+        <el-form-item label="领用时间" :label-width="formLabelWidth">
+          <el-date-picker
+            v-model="formReturn.return_date"
+            type="datetime"
+            :editable="false"
+            placeholder="归还时间"
+            format="YYYY-MM-DD HH:mm"
+            value-format="YYYY-MM-DD HH:mm:ss.SSS"
+          />
+        </el-form-item>
+        <el-form-item class="submit">
+          <el-button type="primary" @click="submitReturnForm">确 认</el-button>
+          <el-button @click="formReturn.visible = false">取 消</el-button>
+        </el-form-item>
+      </el-form>
+    </el-dialog>
   </div>
 </template>
 
 <script>
-import { reactive, onMounted, ref } from 'vue'
+import { useStore } from 'vuex'
+import { computed, reactive, onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
 const genericModel = new GenericModel('v1/analyzer')
@@ -140,6 +226,64 @@ export default {
     const managerIdList = ref([])
     const stateIdList = ref([])
     const tableHeight = ref(300)
+    const formLabelWidth = '140px'
+    const form = ref(null)
+    /**
+     * 表单规则验证
+     */
+    const { rules } = getRules()
+    const formBorrow = ref({
+      visible: false,
+      // id: this.id,
+      // user_id: this.user_id,
+      // resource_type: this.resource_type,
+      // resource_id: this.resource_id,
+      borrow_reason: "",
+      borrow_date: null,
+      expect_return_date: null,
+      return_date: null,
+      comment: "",
+      timeRange: ""
+    })
+    const formReturn = ref({
+      visible: false,
+      return_date: null,
+      comment: ""
+    })
+    // const timeDefault = new Date(2000, 1, 1, 12, 0, 0)
+    const timeDefault = ref([
+      new Date(2000, 1, 1, 9, 0, 0),
+      new Date(2000, 2, 1, 18, 30, 0),
+    ]) // '12:00:00', '08:00:00'
+    const timeShortcuts = [
+      {
+        text: '一小时',
+        value: () => {
+          const start = new Date()
+          const end = new Date()
+          end.setHours(start.getHours() + 1)
+          return [start, end]
+        },
+      },
+      {
+        text: '一天',
+        value: () => {
+          const end = new Date()
+          const start = new Date()
+          end.setTime(start.getTime() + 3600 * 1000 * 24 * 1)
+          return [start, end]
+        },
+      },
+      {
+        text: '一周',
+        value: () => {
+          const end = new Date()
+          const start = new Date()
+          end.setTime(start.getTime() + 3600 * 1000 * 24 * 7)
+          return [start, end]
+        },
+      },
+    ]
 
     onMounted(() => {
       window.addEventListener('resize', () => { setResize() }, false)
@@ -210,7 +354,16 @@ export default {
     const getStateById = id => {
       // console.log(stateIdList.value)
       const item = stateIdList.value.find(item => item.id === id) || {}
-      return item.name
+      return item
+    }
+
+    const getStateByName = name => {
+      const item = stateIdList.value.find(item => item.name === name) || stateIdList[0]
+      return item
+    }
+
+    const getStateNameById = id => {
+      return getStateById(id).name
     }
 
     const getStateTagTypeById = id => {
@@ -221,9 +374,24 @@ export default {
         { type: "warning", name: "领出"},
         { type: "danger", name: "禁用"},
       ]
-      const state = stateIdList.value.find(item => item.id === id) || {}
-      const item = typeList.find(item => item.name === state.name) || typeList[0]
+      const item = typeList.find(item => item.name === getStateById(id).name) || typeList[0]
       return item.type
+    }
+
+    const getStateAvailableById = id => {
+      return getStateById(id).name === "空闲"
+    }
+
+    const getStateBorrowedById = id => {
+      return getStateById(id).name === "领出"
+    }
+
+    const canReturn = row => {
+      // const store = useStore()
+      // const user = computed(() => store.getters.user)
+      // console.log(id, user.value.id, id === user.value.id)
+      // return id === user.value.id
+      return row.returnable
     }
 
     const handleCreate = () => {
@@ -250,6 +418,58 @@ export default {
       })
     }
 
+    const handleBorrow = row => {
+      formBorrow.value = Object.assign(formBorrow.value, row);
+      formBorrow.value.visible = true;
+    }
+
+    const handleReturn = row => {
+      formReturn.value = Object.assign(formReturn.value, row);
+      formReturn.value.visible = true;
+    }
+
+    const submitBorrowForm = async formName => {
+      formBorrow.value.state_id = getStateByName("领出").id // MTODO
+      formBorrow.value.borrow_date = formBorrow.value.timeRange[0]
+      formBorrow.value.expect_return_date = formBorrow.value.timeRange[1]
+      console.log(formBorrow.value)
+      form.value.validate(async valid => {
+        if (valid) {
+          let res = await genericModel.borrowModel(formBorrow.value.id, formBorrow.value)
+          if (res.code < window.MAX_SUCCESS_CODE) {
+            ElMessage.success(`${res.message}`)
+            formBorrow.value.visible = false
+            loading.value = true
+            getModels()
+            loading.value = false
+          }
+        } else {
+          console.error('error submit!!')
+          ElMessage.error('请将信息填写完整')
+        }
+      })
+    }
+
+    const submitReturnForm = async formName => {
+      formReturn.value.state_id = getStateByName("空闲").id // MTODO
+      console.log(formReturn.value)
+      form.value.validate(async valid => {
+        if (valid) {
+          let res = await genericModel.returnModel(formReturn.value.id, formReturn.value)
+          if (res.code < window.MAX_SUCCESS_CODE) {
+            ElMessage.success(`${res.message}`)
+            formReturn.value.visible = false
+            loading.value = true
+            getModels()
+            loading.value = false
+          }
+        } else {
+          console.error('error submit!!')
+          ElMessage.error('请将信息填写完整')
+        }
+      })
+    }
+
     const editClose = () => {
       showEdit.value = false
       getModels()
@@ -268,15 +488,48 @@ export default {
       editClose,
       getOrganizationById,
       getManagerById,
-      getStateById,
+      getStateNameById,
       getStateTagTypeById,
+      getStateAvailableById,
+      getStateBorrowedById,
+      canReturn,
       handleCreate,
       handleEdit,
+      handleBorrow,
+      handleReturn,
+      submitBorrowForm,
+      submitReturnForm,
       editModelId,
       indexMethod,
       handleDelete,
+      formLabelWidth,
+      form,
+      rules,
+      formBorrow,
+      formReturn,
+      timeDefault,
+      timeShortcuts
     }
   },
+}
+
+/**
+ * 表单验证规则
+ */
+function getRules() {
+  /**
+   * 验证回调函数
+   */
+  const checkInfo = (rule, value, callback) => {
+    if (!value) {
+      callback(new Error('信息不能为空'))
+    }
+    callback()
+  }
+  const rules = {
+    name: [{ validator: checkInfo, trigger: 'blur', required: true }],
+  }
+  return { rules }
 }
 </script>
 

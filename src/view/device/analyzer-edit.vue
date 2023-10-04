@@ -122,6 +122,7 @@ export default {
 
     const getModel = async () => {
       const res = await genericModel.getModel(props.editModelId)
+      console.log(res)
       listAssign(data, res)
     }
 
