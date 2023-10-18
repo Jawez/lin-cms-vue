@@ -3,13 +3,39 @@ const adminRouter = {
   name: null,
   title: '系统管理',
   type: 'folder',
-  icon: 'iconfont icon-huiyuanguanli',
+  icon: 'iconfont icon-zidingyi',
   isElementIcon: false,
   filePath: 'view/admin/',
   order: -3,
   inNav: true,
   permission: ['超级管理员独有权限'],
   children: [
+    {
+      route: null,
+      name: null,
+      title: '组织管理',
+      type: 'folder', // 取 route 为默认加载页
+      icon: 'iconfont icon-erjizhibiao',
+      isElementIcon: false,
+      filePath: 'view/enterprise/',
+      inNav: true,
+      children: [
+        {
+          title: '组织列表',
+          name: 'OrganizationList',
+          inNav: true,
+          icon: 'iconfont icon-table1',
+          permission: ['超级管理员独有权限'],
+        },
+        {
+          title: '添加组织',
+          name: 'OrganizationEdit',
+          inNav: true,
+          icon: 'iconfont icon-add',
+          permission: ['超级管理员独有权限'],
+        },
+      ],
+    },
     {
       route: '/admin/user',
       name: null,
@@ -27,7 +53,7 @@ const adminRouter = {
           route: '/admin/user/list',
           filePath: 'view/admin/user/user-list.vue',
           inNav: true,
-          icon: 'iconfont icon-huiyuanguanli',
+          icon: 'iconfont icon-table1',
           isElementIcon: false,
           permission: ['超级管理员独有权限'],
         },
@@ -60,7 +86,7 @@ const adminRouter = {
           inNav: true,
           filePath: 'view/admin/group/group-list.vue',
           title: '分组列表',
-          icon: 'iconfont icon-yunyingguanli_fuwufenzuguanli',
+          icon: 'iconfont icon-table1',
           permission: ['超级管理员独有权限'],
         },
         {

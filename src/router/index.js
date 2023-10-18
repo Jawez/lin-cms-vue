@@ -55,7 +55,7 @@ router.beforeEach((to, from, next) => {
   if (store?.state && store?.getters) {
     const { permissions, user } = store.getters
     if (to.path !== '/about' && !Util.hasPermission(permissions, to.meta, user)) {
-      ElMessage.error('您无此页面的权限哟')
+      ElMessage.error('无法访问')
       next({ path: '/about' })
       return
     }

@@ -6,7 +6,7 @@
         <div class="title">领用列表</div>
       </div>
       <!-- 表格 -->
-      <el-table :data="tableData" v-loading="loading">
+      <el-table :data="tableData" v-loading="loading" :max-height="tableHeight">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="resource_type" label="资源类型"></el-table-column>
         <el-table-column prop="resource_id" label="名称"></el-table-column>
@@ -15,7 +15,7 @@
         <el-table-column prop="borrow_date" label="领用时间"></el-table-column>
         <el-table-column prop="return_date" label="归还时间"></el-table-column>
         <el-table-column prop="comment" label="备注"></el-table-column>
-        <el-table-column label="操作" fixed="right" width="275">
+        <!-- <el-table-column label="操作" fixed="right">
           <template #default="scope">
             <el-button
               plain
@@ -34,7 +34,7 @@
               >删除</el-button
             >
           </template>
-        </el-table-column>
+        </el-table-column> -->
       </el-table>
     </div>
   </div>
@@ -52,10 +52,20 @@ export default {
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
+    const tableHeight = ref(300)
 
     onMounted(() => {
+      window.addEventListener('resize', () => { setResize() }, false)
+      setResize()
       getModels()
     })
+
+    // 响应页面的宽度高度变化
+    const setResize = () => {
+      const height = window.innerHeight - 200
+      tableHeight.value = height >= 120 ? height : 120
+      // console.log(tableHeight)
+    }
 
     const getModels = async () => {
       try {
@@ -101,6 +111,7 @@ export default {
       tableData,
       loading,
       showEdit,
+      tableHeight,
       editClose,
       handleEdit,
       editModelId,

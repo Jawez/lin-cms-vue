@@ -1,7 +1,7 @@
 <template>
-  <div :class="!elMenuCollapse ? 'logo' : 'mobile-logo'">
+  <!-- <div :class="!elMenuCollapse ? 'logo' : 'mobile-logo'">
     <img :src="!elMenuCollapse ? logo : mobileLogo" alt="logo" />
-  </div>
+  </div> -->
 </template>
 
 <script>

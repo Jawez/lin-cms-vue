@@ -26,4 +26,4 @@ const TemplateResourceRouter = {
   ],
 }
 
-export default TemplateResourceRouter
+// export default TemplateResourceRouter
