@@ -38,7 +38,7 @@
                 <el-option
                     v-for="item in managerIdList"
                     :key="item.id"
-                    :label="item.username"
+                    :label="item.nickname"
                     :value="item.id"
                   />
               </el-select>

@@ -30,6 +30,7 @@ import axios from 'lin/plugin/axios'
 import UserModel from '@/lin/model/user'
 import Utils from '@/lin/util/util'
 import Config from '@/config'
+import { useDataList } from '../data'
 
 export default {
   setup() {
@@ -40,6 +41,7 @@ export default {
     const store = useStore()
     const router = useRouter()
     const throttleLogin = ref(null)
+    const { getUsersAndStore } = useDataList()
 
     const account = reactive({
       username: '',
@@ -56,6 +58,7 @@ export default {
         loading.value = true
         await UserModel.getToken(username, password, captcha, tag)
         await getInformation()
+        await getUsersAndStore()
         loading.value = false
         router.push(Config.defaultRoute)
         ElMessage({

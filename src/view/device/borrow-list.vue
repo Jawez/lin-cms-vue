@@ -9,8 +9,8 @@
       <el-table :data="tableData" v-loading="loading" :max-height="tableHeight">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="resource_type" label="资源类型"></el-table-column>
-        <el-table-column prop="resource_id" label="名称"></el-table-column>
-        <el-table-column prop="user_id" label="领用人"></el-table-column>
+        <el-table-column prop="resource_name" label="名称"></el-table-column>
+        <el-table-column prop="nickname" label="领用人"></el-table-column>
         <el-table-column prop="borrow_reason" label="领用事由"></el-table-column>
         <el-table-column prop="borrow_date" label="领用时间"></el-table-column>
         <el-table-column prop="return_date" label="归还时间"></el-table-column>
@@ -45,14 +45,19 @@ import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import BorrowModel from '@/model/borrow'
 const borrowModel = new BorrowModel()
+import { useDataList } from '../data'
 
 export default {
   setup() {
+    const deviceList = ref({
+      analyzer: []
+    })
     const tableData = ref([])
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
     const tableHeight = ref(300)
+    const { getUsersAndStore, getUsersFromStore } = useDataList()
 
     onMounted(() => {
       window.addEventListener('resize', () => { setResize() }, false)
@@ -67,11 +72,32 @@ export default {
       // console.log(tableHeight)
     }
 
+    const getDevice = (type, id) => {
+      const deviceList = JSON.parse(sessionStorage.getItem(type))
+      return deviceList.find(item => item.id === id) || {name: '-'}
+    }
+
+    const getUser = (id) => {
+      const users = getUsersFromStore()
+      return users.find(item => item.id === id) || {nickname: '-'}
+    }
+
     const getModels = async () => {
       try {
+        let borrowList = []
+
         loading.value = true
-        // tableData.value = await borrowModel.getRecords()
-        tableData.value = await borrowModel.getUserRecords()
+        // const modelList = await borrowModel.getRecords()
+        const modelList = await borrowModel.getUserRecords()
+        modelList.forEach(item => {
+          const device = getDevice(item.resource_type, item.resource_id)
+          const user = getUser(item.user_id)
+          item.resource_name = device.name
+          item.nickname = user.nickname
+          borrowList.push(item)
+        })
+
+        tableData.value = borrowList
         loading.value = false
       } catch (error) {
         loading.value = false

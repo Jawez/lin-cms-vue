@@ -184,7 +184,7 @@
           >
           </el-input>
         </el-form-item>
-        <el-form-item label="领用时间" :label-width="formLabelWidth">
+        <el-form-item label="归还时间" :label-width="formLabelWidth">
           <el-date-picker
             v-model="formReturn.return_date"
             type="datetime"
@@ -205,19 +205,23 @@
 
 <script>
 import { useStore } from 'vuex'
-import { computed, reactive, onMounted, ref } from 'vue'
+import { computed, reactive, onMounted, ref, toRaw } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
 const genericModel = new GenericModel('v1/analyzer')
-const dynamicModel = new GenericModel('v1/analyzer')
 import ObjectModify from './analyzer-edit'
 import ManagerModel from '@/lin/model/manager'
+import { forEach } from 'lodash'
+import { useDeviceList } from './device'
+import { useDataList } from '../data'
 
 export default {
   components: {
     ObjectModify,
   },
   setup() {
+    const deviceName = 'analyzer'
+    const { getModels } = useDeviceList()
     const tableData = ref([])
     const editModelId = ref(1)
     const loading = ref(false)
@@ -284,6 +288,7 @@ export default {
         },
       },
     ]
+    const { getUsersAndStore, getUsersFromStore } = useDataList()
 
     onMounted(() => {
       window.addEventListener('resize', () => { setResize() }, false)
@@ -292,7 +297,7 @@ export default {
       getOrganizationList()
       getManagerList()
       getStateList()
-      getModels()
+      getDeviceList()
       loading.value = false
     })
 
@@ -303,19 +308,12 @@ export default {
       // console.log(tableHeight)
     }
 
-    const getModels = async () => {
-      try {
-        tableData.value = await genericModel.getModels()
-      } catch (error) {
-        if (error.code === 10020) {
-          tableData.value = []
-        }
-      }
+    const getDeviceList = async () => {
+      tableData.value = await getModels(deviceName)
     }
 
     const getOrganizationList = async () => {
-      dynamicModel.setRoute('v1/organization')
-      const idList = await dynamicModel.getModels()
+      const idList = await getModels('organization')
       // console.log(idList)
       organizationIdList.value = idList
     }
@@ -325,8 +323,21 @@ export default {
      */
     const getManagerList = async () => {
       try {
-        const res = await ManagerModel.getManagers('设备管理员')
-        managerIdList.value = res.users
+        const users = getUsersFromStore() || (await getUsersAndStore())
+        // console.log(users)
+        if (users) {
+          let list = []
+          users.forEach(item => {
+            if (item.groups.find(group => (group.name === 'device') || (group.name === 'root'))) {
+              list.push(item)
+            }
+          });
+          managerIdList.value = list
+        }
+        else {
+          const res = await ManagerModel.getManagers('device')    // MTODO: test or remove
+          managerIdList.value = res.users
+        }
         // console.log(managerIdList.value)
       } catch (e) {
         console.error(e)
@@ -334,8 +345,7 @@ export default {
     }
 
     const getStateList = async () => {
-      dynamicModel.setRoute('v1/state')
-      const idList = await dynamicModel.getModels()
+      const idList = await getModels('state')
       // console.log(idList)
       stateIdList.value = idList
     }
@@ -348,7 +358,7 @@ export default {
     const getManagerById = id => {
       // console.log(managerIdList.value)
       const item = managerIdList.value.find(item => item.id === id) || {}
-      return item.username
+      return item.nickname  // item.username
     }
 
     const getStateById = id => {
@@ -412,7 +422,7 @@ export default {
       }).then(async () => {
         const res = await genericModel.deleteModel(id)
         if (res.code < window.MAX_SUCCESS_CODE) {
-          getModels()
+          getDeviceList()
           ElMessage.success(`${res.message}`)
         }
       })
@@ -440,7 +450,7 @@ export default {
             ElMessage.success(`${res.message}`)
             formBorrow.value.visible = false
             loading.value = true
-            getModels()
+            getDeviceList()
             loading.value = false
           }
         } else {
@@ -460,7 +470,7 @@ export default {
             ElMessage.success(`${res.message}`)
             formReturn.value.visible = false
             loading.value = true
-            getModels()
+            getDeviceList()
             loading.value = false
           }
         } else {
@@ -472,7 +482,7 @@ export default {
 
     const editClose = () => {
       showEdit.value = false
-      getModels()
+      getDeviceList()
     }
 
     const indexMethod = index => index + 1
