@@ -41,7 +41,7 @@ export default {
     const store = useStore()
     const router = useRouter()
     const throttleLogin = ref(null)
-    const { getUsersAndStore } = useDataList()
+    const { getUsersAndStore, getModelsAndStore } = useDataList()
 
     const account = reactive({
       username: '',
@@ -59,6 +59,8 @@ export default {
         await UserModel.getToken(username, password, captcha, tag)
         await getInformation()
         await getUsersAndStore()
+        await getModelsAndStore('organization')
+        await getModelsAndStore('state')
         loading.value = false
         router.push(Config.defaultRoute)
         ElMessage({

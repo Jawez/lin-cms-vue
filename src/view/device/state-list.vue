@@ -38,6 +38,7 @@ import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
 const genericModel = new GenericModel('v1/state')
 import ObjectModify from './state-edit'
+import { useDataList } from '../data'
 
 export default {
   components: {
@@ -48,6 +49,7 @@ export default {
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
+    const { getModelsAndStore } = useDataList()
 
     onMounted(() => {
       getModels()
@@ -56,7 +58,7 @@ export default {
     const getModels = async () => {
       try {
         loading.value = true
-        state_group.value = await genericModel.getModels()
+        state_group.value = await getModelsAndStore('state')
         loading.value = false
       } catch (error) {
         loading.value = false

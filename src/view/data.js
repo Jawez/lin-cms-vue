@@ -1,4 +1,6 @@
 import AdminModel from '@/lin/model/admin'
+import GenericModel from '@/model/generic-model'
+const dynamicModel = new GenericModel('v1')
 
 export const useDataList = () => {
   /**
@@ -50,8 +52,30 @@ export const useDataList = () => {
     return users
   }
 
+  const getModelsAndStore = async (name) => {
+    try {
+      dynamicModel.setRoute('v1/' + name)
+      const modelList = await dynamicModel.getModels()
+      sessionStorage.setItem(name, JSON.stringify(modelList))
+      // console.log(modelList)
+      return modelList
+    } catch (error) {
+      if (error.code === 10020) {
+      }
+    }
+    return []
+  }
+
+  // MTODO: timeout
+  const getDataFromStore = (name) => {
+    const users = JSON.parse(sessionStorage.getItem(name))
+    return users
+  }
+
   return {
     getUsersAndStore,
     getUsersFromStore,
+    getModelsAndStore,
+    getDataFromStore,
   }
 }

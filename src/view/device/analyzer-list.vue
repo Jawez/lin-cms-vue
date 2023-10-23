@@ -212,7 +212,6 @@ const genericModel = new GenericModel('v1/analyzer')
 import ObjectModify from './analyzer-edit'
 import ManagerModel from '@/lin/model/manager'
 import { forEach } from 'lodash'
-import { useDeviceList } from './device'
 import { useDataList } from '../data'
 
 export default {
@@ -221,7 +220,6 @@ export default {
   },
   setup() {
     const deviceName = 'analyzer'
-    const { getModels } = useDeviceList()
     const tableData = ref([])
     const editModelId = ref(1)
     const loading = ref(false)
@@ -288,7 +286,7 @@ export default {
         },
       },
     ]
-    const { getUsersAndStore, getUsersFromStore } = useDataList()
+    const { getUsersAndStore, getUsersFromStore, getModelsAndStore, getDataFromStore } = useDataList()
 
     onMounted(() => {
       window.addEventListener('resize', () => { setResize() }, false)
@@ -309,11 +307,11 @@ export default {
     }
 
     const getDeviceList = async () => {
-      tableData.value = await getModels(deviceName)
+      tableData.value = await getModelsAndStore(deviceName)
     }
 
     const getOrganizationList = async () => {
-      const idList = await getModels('organization')
+      const idList = getDataFromStore('organization')
       // console.log(idList)
       organizationIdList.value = idList
     }
@@ -323,7 +321,7 @@ export default {
      */
     const getManagerList = async () => {
       try {
-        const users = getUsersFromStore() || (await getUsersAndStore())
+        const users = getUsersFromStore()
         // console.log(users)
         if (users) {
           let list = []
@@ -345,7 +343,7 @@ export default {
     }
 
     const getStateList = async () => {
-      const idList = await getModels('state')
+      const idList = getDataFromStore('state')
       // console.log(idList)
       stateIdList.value = idList
     }
