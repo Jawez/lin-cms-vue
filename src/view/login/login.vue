@@ -60,6 +60,7 @@ export default {
         await getInformation()
         await getUsersAndStore()
         await getModelsAndStore('organization')
+        await getModelsAndStore('resource-type')
         await getModelsAndStore('state')
         loading.value = false
         router.push(Config.defaultRoute)

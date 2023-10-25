@@ -8,7 +8,7 @@
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" :max-height="tableHeight">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
-        <el-table-column prop="resource_type" label="资源类型"></el-table-column>
+        <el-table-column prop="resource_type_name" label="资源类型"></el-table-column>
         <el-table-column prop="resource_name" label="名称"></el-table-column>
         <el-table-column prop="nickname" label="领用人"></el-table-column>
         <el-table-column prop="borrow_reason" label="领用事由"></el-table-column>
@@ -57,7 +57,7 @@ export default {
     const loading = ref(false)
     const showEdit = ref(false)
     const tableHeight = ref(300)
-    const { getUsersAndStore, getUsersFromStore } = useDataList()
+    const { getUsersAndStore, getUsersFromStore, getModelsAndStore, getDataFromStore } = useDataList()
 
     onMounted(() => {
       window.addEventListener('resize', () => { setResize() }, false)
@@ -70,6 +70,11 @@ export default {
       const height = window.innerHeight - 200
       tableHeight.value = height >= 120 ? height : 120
       // console.log(tableHeight)
+    }
+
+    const getResourceType = (type) => {
+      const typeList = getDataFromStore('resource-type')
+      return typeList.find(item => item.table_name === type) || {name: type}
     }
 
     const getDevice = (type, id) => {
@@ -90,8 +95,10 @@ export default {
         // const modelList = await borrowModel.getRecords()
         const modelList = await borrowModel.getUserRecords()
         modelList.forEach(item => {
+          const resourceType = getResourceType(item.resource_type)
           const device = getDevice(item.resource_type, item.resource_id)
           const user = getUser(item.user_id)
+          item.resource_type_name = resourceType.name
           item.resource_name = device.name
           item.nickname = user.nickname
           borrowList.push(item)

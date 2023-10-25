@@ -6,7 +6,7 @@
         <div class="title">设备类型列表</div>
       </div>
       <!-- 表格 -->
-      <el-table :data="__data_group" v-loading="loading">
+      <el-table :data="tableData" v-loading="loading">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
@@ -37,18 +37,19 @@ import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
 const genericModel = new GenericModel('v1/resource-type')
-// import ObjectModify from './__name-edit'
 import ObjectModify from './resource-type-edit'
+import { useDataList } from '../data'
 
 export default {
   components: {
     ObjectModify,
   },
   setup() {
-    const __data_group = ref([])
+    const tableData = ref([])
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
+    const { getModelsAndStore } = useDataList()
 
     onMounted(() => {
       getModels()
@@ -57,12 +58,12 @@ export default {
     const getModels = async () => {
       try {
         loading.value = true
-        __data_group.value = await genericModel.getModels()
+        tableData.value = await getModelsAndStore('resource-type')
         loading.value = false
       } catch (error) {
         loading.value = false
         if (error.code === 10020) {
-          __data_group.value = []
+          tableData.value = []
         }
       }
     }
@@ -94,7 +95,7 @@ export default {
     const indexMethod = index => index + 1
 
     return {
-      __data_group,
+      tableData,
       loading,
       showEdit,
       editClose,

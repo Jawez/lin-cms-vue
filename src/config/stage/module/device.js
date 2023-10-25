@@ -10,34 +10,34 @@ const deviceRouter = {
   inNav: true,
 
   children: [
-    {
-      route: null,
-      name: null,
-      title: '设备类型',
-      type: 'folder',
-      icon: 'iconfont icon-erjituandui',
-      isElementIcon: false,
-      filePath: 'view/device/',
-      inNav: true,
-      children: [
-        {
-          title: '设备类型列表',
-          name: 'ResourceTypeList',
-          filePath: 'view/device/resource-type-list.vue',
-          inNav: true,
-          icon: 'iconfont icon-table1',
-          permission: ['修改设备类型'],
-        },
-        {
-          title: '添加设备类型',
-          name: 'ResourceTypeEdit',
-          filePath: 'view/device/resource-type-edit.vue',
-          inNav: true,
-          icon: 'iconfont icon-add',
-          permission: ['修改设备类型'],
-        },
-      ],
-    },
+    // {
+    //   route: null,
+    //   name: null,
+    //   title: '设备类型',
+    //   type: 'folder',
+    //   icon: 'iconfont icon-erjituandui',
+    //   isElementIcon: false,
+    //   filePath: 'view/device/',
+    //   inNav: true,
+    //   children: [
+    //     {
+    //       title: '设备类型列表',
+    //       name: 'ResourceTypeList',
+    //       filePath: 'view/device/resource-type-list.vue',
+    //       inNav: true,
+    //       icon: 'iconfont icon-table1',
+    //       permission: ['修改设备类型'],
+    //     },
+    //     {
+    //       title: '添加设备类型',
+    //       name: 'ResourceTypeEdit',
+    //       filePath: 'view/device/resource-type-edit.vue',
+    //       inNav: true,
+    //       icon: 'iconfont icon-add',
+    //       permission: ['修改设备类型'],
+    //     },
+    //   ],
+    // },
     {
       route: null,
       name: null,
@@ -69,6 +69,12 @@ const deviceRouter = {
     {
       title: '抓包工具列表',
       name: 'AnalyzerList',
+      inNav: true,
+      icon: 'iconfont icon-table1',
+    },
+    {
+      title: '测试手机列表',
+      name: 'PhoneList',
       inNav: true,
       icon: 'iconfont icon-table1',
     },
