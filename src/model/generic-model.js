@@ -3,12 +3,12 @@ import _axios, { get, post, put, _delete } from '@/lin/plugin/axios'
 
 // 我们通过 class 这样的语法糖使模型这个概念更加具象化，其优点：耦合性低、可维护性。
 class GenericModel {
-  constructor(route) {
-    this.route = route
+  constructor(name, route) {
+    this.setRoute(name, route)
   }
 
-  setRoute(route) {
-    this.route = route
+  setRoute(name, route) {
+    this.route = (route || 'v1/resource/') + name
   }
 
   // 类中的方法可以代表一个用户行为

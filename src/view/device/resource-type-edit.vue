@@ -40,7 +40,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/resource-type')
+const genericModel = new GenericModel('resource-type')
 
 export default {
   props: {

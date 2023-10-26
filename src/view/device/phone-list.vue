@@ -3,7 +3,7 @@
     <!-- 列表页面 -->
     <div class="container" v-if="!showEdit">
       <div class="header">
-        <div class="title">抓包工具列表</div>
+        <div class="title">测试手机列表</div>
       </div>
       <!-- 表格 -->
       <el-table :data="tableData" v-loading="loading" :max-height="tableHeight">
@@ -72,7 +72,7 @@
               size="small"
               type="primary"
               @click="handleEdit(scope.row.id)"
-              v-permission="'更新资源'"
+              v-permission="'更新测试手机'"
               >编辑
             </el-button>
             <!-- <el-button plain size="small" type="primary" @click="$router.push(`/__name/edit`)">编辑</el-button> -->
@@ -81,7 +81,7 @@
               size="small"
               type="danger"
               @click="handleDelete(scope.row.id)"
-              v-permission="'删除资源'"
+              v-permission="'删除测试手机'"
               >删除
             </el-button>
             <!-- <el-button
@@ -89,7 +89,7 @@
               size="small"
               type="danger"
               @click="handleDelete(scope.row.id)"
-              v-permission="{ permission: '删除资源', type: 'disabled' }"
+              v-permission="{ permission: '删除测试手机', type: 'disabled' }"
               >删除
             </el-button> -->
           </template>
@@ -102,7 +102,7 @@
         plain
         style="width: 100%"
         @click="handleCreate()"
-        v-permission="'添加资源'"
+        v-permission="'添加测试手机'"
         >添加
       </el-button>
     </div>
@@ -208,7 +208,7 @@ import { useStore } from 'vuex'
 import { computed, reactive, onMounted, ref, toRaw } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/phone')
+const genericModel = new GenericModel('phone', 'v1/device/')
 import ObjectModify from './phone-edit'
 import ManagerModel from '@/lin/model/manager'
 import { forEach } from 'lodash'
@@ -307,7 +307,7 @@ export default {
     }
 
     const getDeviceList = async () => {
-      tableData.value = await getModelsAndStore(deviceName)
+      tableData.value = await getModelsAndStore(deviceName, 'v1/device/')
     }
 
     const getOrganizationList = async () => {

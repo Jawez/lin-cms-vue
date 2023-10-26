@@ -1,10 +1,10 @@
 <template>
   <div class="container">
     <div class="title" v-if="!editModelId">
-      <span>新建抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+      <span>新建测试手机</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
     <div class="title" v-else>
-      <span>修改抓包工具</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
+      <span>修改测试手机</span> <span class="back" @click="back"> <i class="iconfont icon-fanhui"></i> 返回 </span>
     </div>
 
     <div class="wrap">
@@ -69,7 +69,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/phone')
+const genericModel = new GenericModel('phone', 'v1/device/')
 
 export default {
   props: {

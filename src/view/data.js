@@ -40,8 +40,6 @@ export const useDataList = () => {
       console.error(e)
     }
 
-    console.log(usersCount)
-    console.log(users)
     sessionStorage.setItem('users', JSON.stringify(users))
     return users
   }
@@ -52,9 +50,9 @@ export const useDataList = () => {
     return users
   }
 
-  const getModelsAndStore = async (name) => {
+  const getModelsAndStore = async (name, route) => {
     try {
-      dynamicModel.setRoute('v1/' + name)
+      dynamicModel.setRoute(name, route)
       const modelList = await dynamicModel.getModels()
       sessionStorage.setItem(name, JSON.stringify(modelList))
       // console.log(modelList)

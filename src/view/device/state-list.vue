@@ -12,14 +12,20 @@
         <el-table-column prop="description" label="描述"></el-table-column>
         <el-table-column label="操作" fixed="right" width="275">
           <template #default="scope">
-            <el-button plain size="small" type="primary" @click="handleEdit(scope.row.id)">编辑</el-button>
-            <!-- <el-button plain size="small" type="primary" @click="$router.push(`/__name/edit`)">编辑</el-button> -->
+            <el-button
+              plain
+              size="small"
+              type="primary"
+              @click="handleEdit(scope.row.id)"
+              v-permission="{ permission: '更新资源', type: 'disabled' }"
+              >编辑</el-button
+            >
             <el-button
               plain
               size="small"
               type="danger"
               @click="handleDelete(scope.row.id)"
-              v-permission="{ permission: '删除状态', type: 'disabled' }"
+              v-permission="{ permission: '删除资源', type: 'disabled' }"
               >删除</el-button
             >
           </template>
@@ -36,7 +42,7 @@
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/state')
+const genericModel = new GenericModel('state')
 import ObjectModify from './state-edit'
 import { useDataList } from '../data'
 

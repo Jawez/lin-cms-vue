@@ -37,7 +37,7 @@
 import { reactive, ref, onMounted } from 'vue'
 import { ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/state')
+const genericModel = new GenericModel('state')
 
 export default {
   props: {

@@ -6,7 +6,7 @@
         <div class="title">template-name列表</div>
       </div>
       <!-- 表格 -->
-      <el-table :data="template_data_group" v-loading="loading">
+      <el-table :data="tableData" v-loading="loading">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
@@ -36,7 +36,7 @@
 import { onMounted, ref } from 'vue'
 import { ElMessageBox, ElMessage } from 'element-plus'
 import GenericModel from '@/model/generic-model'
-const genericModel = new GenericModel('v1/template-resource')
+const genericModel = new GenericModel('template-resource')
 import ObjectModify from './template-resource-edit'
 
 export default {
@@ -44,7 +44,7 @@ export default {
     ObjectModify,
   },
   setup() {
-    const template_data_group = ref([])
+    const tableData = ref([])
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
@@ -56,12 +56,12 @@ export default {
     const getModels = async () => {
       try {
         loading.value = true
-        template_data_group.value = await genericModel.getModels()
+        tableData.value = await genericModel.getModels()
         loading.value = false
       } catch (error) {
         loading.value = false
         if (error.code === 10020) {
-          template_data_group.value = []
+          tableData.value = []
         }
       }
     }
@@ -93,7 +93,7 @@ export default {
     const indexMethod = index => index + 1
 
     return {
-      template_data_group,
+      tableData,
       loading,
       showEdit,
       editClose,
