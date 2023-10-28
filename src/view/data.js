@@ -16,19 +16,19 @@ export const useDataList = () => {
         count: pageCount,
         page: 0,
       })
-      console.log(res)
+      // console.log(res)
 
       const totalNum = res.total // 分组内的用户总数
       usersCount += res.items.length
       users = users.concat(res.items)
-      console.log(res.items)
+      // console.log(res.items)
 
       for (let currentPage = 2; usersCount < totalNum; currentPage++) {
         res = await AdminModel.getAdminUsers({
           count: pageCount,
           page: currentPage - 1,
         })
-        console.log(res.items)
+        // console.log(res.items)
 
         if (res.items.length === 0) {
           break;

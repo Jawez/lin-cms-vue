@@ -6,16 +6,12 @@
         <div class="title">测试手机列表</div>
       </div>
       <!-- 表格 -->
-      <el-table :data="tableData" v-loading="loading" :max-height="tableHeight">
-        <el-table-column type="expand">
-          <template #default="props">
-            <div class="descriptions">
-              <el-descriptions column="1" :title="props.row.name">
-                <el-descriptions-item>{{ props.row.description }}</el-descriptions-item>
-              </el-descriptions>
-            </div>
-          </template>
-        </el-table-column>
+      <el-table
+        :data="tableData"
+        v-loading="loading"
+        :max-height="tableHeight"
+        :key="tableKey"
+        @row-click="getModel">
         <el-table-column type="index" :index="indexMethod" label="序号" width="100"></el-table-column>
         <el-table-column prop="name" label="名称"></el-table-column>
         <el-table-column prop="description" label="描述"></el-table-column>
@@ -40,7 +36,7 @@
               plain
               size="small"
               type="primary"
-              @click="handleBorrow(scope.row)"
+              @click.navite.stop="handleBorrow(scope.row)"
               v-if="getStateAvailableById(scope.row.state_id)"
               >领用
             </el-button>
@@ -48,7 +44,7 @@
               plain
               size="small"
               type="success"
-              @click="handleReturn(scope.row)"
+              @click.navite.stop="handleReturn(scope.row)"
               v-else-if="getStateBorrowedById(scope.row.state_id) && canReturn(scope.row)"
               >归还
             </el-button>
@@ -71,16 +67,15 @@
               plain
               size="small"
               type="primary"
-              @click="handleEdit(scope.row.id)"
+              @click.navite.stop="handleEdit(scope.row.id)"
               v-permission="'更新测试手机'"
               >编辑
             </el-button>
-            <!-- <el-button plain size="small" type="primary" @click="$router.push(`/__name/edit`)">编辑</el-button> -->
             <el-button
               plain
               size="small"
               type="danger"
-              @click="handleDelete(scope.row.id)"
+              @click.navite.stop="handleDelete(scope.row.id)"
               v-permission="'删除测试手机'"
               >删除
             </el-button>
@@ -117,13 +112,10 @@
     <el-dialog v-model="formBorrow.visible" title="领用设备">
       <el-form :model="formBorrow" ref="form" @submit.prevent :rules="rules">
         <el-form-item label="名称" :label-width="formLabelWidth">
-          <el-input v-model="formBorrow.name" autocomplete="off" />
+          <el-input v-model="formBorrow.name" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth">
-          <el-input v-model="formBorrow.description" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="组织" :label-width="formLabelWidth">
-          <el-input v-model="formBorrow.organization_id" autocomplete="off" />
+          <el-input v-model="formBorrow.description" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="领用事由" :label-width="formLabelWidth">
           <el-input
@@ -166,13 +158,10 @@
     <el-dialog v-model="formReturn.visible" title="归还设备">
       <el-form :model="formReturn" ref="form" @submit.prevent :rules="rules">
         <el-form-item label="名称" :label-width="formLabelWidth">
-          <el-input v-model="formReturn.name" autocomplete="off" />
+          <el-input v-model="formReturn.name" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="描述" :label-width="formLabelWidth">
-          <el-input v-model="formReturn.description" autocomplete="off" />
-        </el-form-item>
-        <el-form-item label="组织" :label-width="formLabelWidth">
-          <el-input v-model="formReturn.organization_id" autocomplete="off" />
+          <el-input v-model="formReturn.description" autocomplete="off" disabled/>
         </el-form-item>
         <el-form-item label="备注" :label-width="formLabelWidth">
           <el-input
@@ -200,6 +189,17 @@
         </el-form-item>
       </el-form>
     </el-dialog>
+
+    <el-dialog v-model="rowDetails.visible" title="设备信息">
+      <div class="descriptions">
+        <el-descriptions column="1" :title="rowDetails.data.name">
+          <el-descriptions-item>{{ rowDetails.data.description }}</el-descriptions-item>
+          <el-descriptions-item v-if="getStateBorrowedById(rowDetails.data.state_id)">领用人：{{ rowDetails.data.username }}</el-descriptions-item>
+          <el-descriptions-item v-if="getStateBorrowedById(rowDetails.data.state_id)">领用时间：{{ rowDetails.data.borrow_date }}</el-descriptions-item>
+          <el-descriptions-item v-if="getStateBorrowedById(rowDetails.data.state_id)">预计归还：{{ rowDetails.data.expect_return_date }}</el-descriptions-item>
+        </el-descriptions>
+      </div>
+    </el-dialog>
   </div>
 </template>
 
@@ -221,6 +221,7 @@ export default {
   setup() {
     const deviceName = 'phone'
     const tableData = ref([])
+    const tableKey = ref(false)
     const editModelId = ref(1)
     const loading = ref(false)
     const showEdit = ref(false)
@@ -251,6 +252,10 @@ export default {
       visible: false,
       return_date: null,
       comment: ""
+    })
+    const rowDetails = ref({
+      visible: false,
+      data: {}
     })
     // const timeDefault = new Date(2000, 1, 1, 12, 0, 0)
     const timeDefault = ref([
@@ -310,6 +315,22 @@ export default {
       tableData.value = await getModelsAndStore(deviceName, 'v1/device/')
     }
 
+    const getModel = async (row) => {
+        const res = await genericModel.getModel(row.id)
+        if (res.user_id) {
+          const users = getUsersFromStore()
+          const user = users.find(user => (user.id === res.user_id)) || { nickname: "-"}
+          res.username = user.nickname
+        }
+        rowDetails.value.visible = true
+        rowDetails.value.data = res
+        const index = tableData.value.findIndex(item => (item.id === res.id) && (item.state_id !== res.state_id))
+        if (index > -1) {
+          tableData.value[index] = Object.assign(toRaw(row), res);
+          tableKey.value = !tableKey.value
+        }
+    }
+
     const getOrganizationList = async () => {
       const idList = getDataFromStore('organization')
       // console.log(idList)
@@ -326,16 +347,16 @@ export default {
         if (users) {
           let list = []
           users.forEach(item => {
-            if (item.groups.find(group => (group.name === 'device') || (group.name === 'root'))) {
+            if (item.groups.find(group => (group.id === 4))) {
               list.push(item)
             }
           });
           managerIdList.value = list
         }
-        else {
-          const res = await ManagerModel.getManagers('device')    // MTODO: test or remove
-          managerIdList.value = res.users
-        }
+        // else {
+        //   const res = await ManagerModel.getManagers(deviceName)    // MTODO: test or remove
+        //   managerIdList.value = res.users
+        // }
         // console.log(managerIdList.value)
       } catch (e) {
         console.error(e)
@@ -487,12 +508,14 @@ export default {
 
     return {
       tableData,
+      tableKey,
       loading,
       showEdit,
       organizationIdList,
       managerIdList,
       stateIdList,
       tableHeight,
+      getModel,
       editClose,
       getOrganizationById,
       getManagerById,
@@ -515,6 +538,7 @@ export default {
       rules,
       formBorrow,
       formReturn,
+      rowDetails,
       timeDefault,
       timeShortcuts
     }
